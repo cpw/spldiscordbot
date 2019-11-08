@@ -10,4 +10,8 @@ WORKDIR /app
 RUN tar -xvf spldiscord.tar
 WORKDIR /app/spldiscord
 VOLUME /app/volume
+# Snowflake IDs for all of these
+ENV REQUEST_CHANNEL=0 MODS_CHANNEL=0 GUILD=0 APPROVER_ROLE=0
+# Directory for the serverpacklocator - typically this will be the servermods folder under the minecraft server directory
+ENV OUTPUT_DIR=/app/volume/
 CMD bin/spldiscord
