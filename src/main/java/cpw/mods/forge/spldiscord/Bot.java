@@ -257,7 +257,7 @@ public class Bot {
         if (r.status() == HttpResponseStatus.OK) {
             return buf.asInputStream().map(inputStreamHandler);
         } else {
-            buf.asString().doOnNext(s->LogManager.getLogger().error("Failed to download {} : {}", url, s));
+            buf.asString().doFinally(s->LogManager.getLogger().error("Failed to download {} : {}", url, s));
             return Mono.error(new IllegalStateException("Invalid status response "+r.status()));
         }
     }
