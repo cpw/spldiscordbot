@@ -253,6 +253,7 @@ public class Bot {
     }
 
     private <T> Mono<T> downloadUrl(final String url, final Function<InputStream, T> inputStreamHandler) {
+        LogManager.getLogger().info("Downloading file from URL {}", url);
         HttpClient httpClient = HttpClient.create().followRedirect(true)
                 .headers(h->h.set(HttpHeaderNames.USER_AGENT, "SPL Discord Bot (1.0)").set(HttpHeaderNames.ACCEPT, "*/*"));
         return httpClient.get().uri(url).responseSingle((r, buf) -> handleDownload(r, url, buf, inputStreamHandler));
