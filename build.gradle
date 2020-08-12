@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'cpw.mods.forge'
-version '0.2'
+version '0.3'
 
 sourceCompatibility = 1.8
 
@@ -26,7 +26,7 @@ compileJava {
 }
 
 dependencies {
-    implementation('com.discord4j:discord4j-core:3.0.13')
+    implementation('com.discord4j:discord4j-core:3.0.15')
     implementation('org.apache.logging.log4j:log4j-api:2.11.2')
     implementation('org.apache.logging.log4j:log4j-core:2.11.2')
     runtime('org.apache.logging.log4j:log4j-slf4j-impl:2.11.2')

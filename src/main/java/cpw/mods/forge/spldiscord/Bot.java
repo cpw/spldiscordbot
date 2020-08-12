@@ -21,6 +21,7 @@ import reactor.netty.ByteBufMono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.http.client.HttpClientResponse;
 import reactor.util.function.Tuple3;
+import sun.rmi.runtime.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -192,16 +193,19 @@ public class Bot {
                             .orElse(Mono.empty()))
                     .then(ok);
         } else if (message.getContent().map(s->s.startsWith("http") && s.endsWith(".jar")).orElse(Boolean.FALSE)) {
+            LogManager.getLogger().info("Downloading from message URL: {}", message.getContent().get());
             files = Flux.from(message.getContent()
                     .map(url -> downloadUrl(url,
                             inputStream -> saveFile(inputStream, getFilenameFromUrlString(url)))).orElse(Mono.empty()))
                     .then(ok);
         } else if (message.getContent().map(s->s.startsWith("https://www.curseforge.com/minecraft/")).orElse(Boolean.FALSE)) {
+            LogManager.getLogger().info("Downloading from CURSE URL: {}", message.getContent().get());
             files = downloadUrl("https://addons-ecs.forgesvc.net/api/v2/addon/0/file/"+ getFilenameFromUrlString(message.getContent().get())+"/download-url", this::getInputStreamAsString)
                     .flatMap(actual->downloadUrl(actual,
                             is-> saveFile(is, getFilenameFromUrlString(actual))))
                     .then(ok);
         } else {
+            LogManager.getLogger().info("Unable to understand message: {}", message.getContent().orElse("NO CONTENT FOUND"));
             files = message.addReaction(UNAMUSED);
         }
         return files.onErrorResume(throwable -> reactionError(throwable, message));
@@ -244,6 +248,7 @@ public class Bot {
     }
 
     private <T> Mono<T> downloadAttachment(final Attachment attachment, final Function<InputStream, T> inputStreamHandler) {
+        LogManager.getLogger().info("Downloading from message attachment: {}", attachment.getFilename());
         return downloadUrl(attachment.getUrl(), inputStreamHandler);
     }
 
@@ -257,7 +262,7 @@ public class Bot {
         if (r.status() == HttpResponseStatus.OK) {
             return buf.asInputStream().map(inputStreamHandler);
         } else {
-            buf.asString().doFinally(s->LogManager.getLogger().error("Failed to download {} : {}", url, s));
+            LogManager.getLogger().error("Failed to download {} : {}", url, r.status());
             return Mono.error(new IllegalStateException("Invalid status response "+r.status()));
         }
     }
